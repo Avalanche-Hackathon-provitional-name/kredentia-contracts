@@ -12,3 +12,8 @@ docs/
 
 # Dotenv file
 .env
+
+cache_forge/
+node_modules/
+lib/
+out/
