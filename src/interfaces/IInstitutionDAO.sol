@@ -22,5 +22,6 @@ interface IInstitutionDAO {
     // View functions
     function getAllRoles() external view returns (bytes32[] memory);
     function getMemberRoles(address _member) external view returns (bytes32[] memory);
+    function getMember(address _member) external view returns (string memory name, string memory department, bool active);
     function getAllMembers() external view returns (address[] memory);
 }

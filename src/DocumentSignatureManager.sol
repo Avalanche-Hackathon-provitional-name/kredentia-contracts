@@ -28,7 +28,14 @@ contract DocumentSignatureManager is Initializable, EIP712Upgradeable, AccessCon
 
     InstitutionDAO public institutionDAO;
 
-    event SignatureAdded(uint256 indexed documentId, address indexed signer, bytes32 role);
+    event SignatureAdded(
+        uint256 indexed documentId,
+        address indexed signer,
+        bytes32 indexed role,
+        bytes32 documentHash,
+        uint256 timestamp,
+        string signerName
+    );
     event SignatureVerified(uint256 indexed documentId, address indexed signer, bool isValid);
 
     function initialize(
@@ -79,6 +86,10 @@ contract DocumentSignatureManager is Initializable, EIP712Upgradeable, AccessCon
         uint256 _deadline,
         bytes memory _signature
     ) internal {
+        // Get signer information and verify active status first
+        (string memory signerName, string memory department, bool isActive) = institutionDAO.getMember(_signer);
+        require(isActive, "Signer must be an active member");
+        
         require(block.timestamp <= _deadline, "Signature deadline passed");
         require(!hasSignerSigned[_documentId][_signer], "Already signed");
         require(institutionDAO.hasRole(_role, _signer), "Invalid role for signer");
@@ -109,7 +120,16 @@ contract DocumentSignatureManager is Initializable, EIP712Upgradeable, AccessCon
         hasRoleSigned[_documentId][_role] = true;
         signatureCount[_documentId]++;
 
-        emit SignatureAdded(_documentId, _signer, _role);
+        emit SignatureAdded(
+            _documentId,
+            _signer,
+            _role,
+            _documentHash,
+            block.timestamp,
+            signerName
+        );
+        
+        // Emit additional verification event for backend tracking
         emit SignatureVerified(_documentId, _signer, isValid);
     }
 

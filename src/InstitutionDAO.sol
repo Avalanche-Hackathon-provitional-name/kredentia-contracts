@@ -265,4 +265,9 @@ contract InstitutionDAO is Initializable, AccessControlUpgradeable {
     function isMember(address _member) external view returns (bool) {
         return members[_member].active;
     }
+    
+    function getMember(address _member) external view returns (string memory name, string memory department, bool active) {
+        Member memory member = members[_member];
+        return (member.name, member.department, member.active);
+    }
 }
